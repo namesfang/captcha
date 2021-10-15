@@ -1,0 +1,36 @@
+{
+    "name": "namesfang/captcha",
+    "description": "图片验证码",
+    "type": "library",
+    "keywords": [
+        "图片验证码",
+        "captcha"
+    ],
+    "homepage": "https://github.com/namesfang/captcha",
+    "authors": [
+        {
+            "name": "堪笑",
+            "email": "jixiang.f@gmail.com",
+            "role": "Developer",
+            "homepage": "http://cli.life"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "ext-gd": "*",
+        "ext-fileinfo": "*",
+        "ext-mbstring": "*"
+    },
+    "support": {
+        "email": "jixiang.f@gmail.com",
+        "issues": "https://github.com/namesfang/captcha/issues",
+        "wiki": "https://github.com/namesfang/captcha/wiki"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Namesfang\\Captcha\\": "src"
+        }
+    },
+    "minimum-stability": "stable"
+}
