@@ -54,7 +54,7 @@ class Option
     /**
      * @var bool 特效
      */
-    protected $effect = true;
+    protected $effect = false;
 
     /**
      * @var $quality 图像质量 0-9
