@@ -102,7 +102,6 @@ class Bundle
 
         // 非透明背景时
         if (false === $background->isTransparent()) {
-
             // 纯色背景
             if (count($bc = $background->getColor())) {
                 $identifier = imagecolorallocate($image, $bc[0], $bc[1], $bc[2]);
@@ -132,14 +131,20 @@ class Bundle
 
         // 有效的验证码
         if ($length) {
+            $colors = array_fill(0, $length, '');
+
+            array_walk($colors, function (&$color) use ($image) {
+                $color = imagecolorallocate($image, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
+            });
+
             // 绘制背景线
-            $this->drawLines($image, $width, $height, $length);
+            $this->drawLines($image, $width, $height, $length, $colors);
 
             // 绘制验证码
-            $this->writePhrase($image, $width, $height, $length);
+            $this->writePhrase($image, $width, $height, $length, $colors);
 
             // 绘制前景线
-            $this->drawLines($image, $width, $height, $length);
+            $this->drawLines($image, $width, $height, $length, $colors);
 
             // 其他特效
             if ($this->option->isEffect()) {
@@ -160,29 +165,26 @@ class Bundle
      * @param $width
      * @param $height
      */
-    protected function drawLines($image, $width, $height)
+    protected function drawLines($image, $width, $height, $length, $colors)
     {
-        $length = mt_rand(1, 3);
-
-        while ($length > -1) {
-            $color = imagecolorallocate($image, mt_rand(100, 255), mt_rand(100, 255), mt_rand(100, 255));
-
-            if (mt_rand(0, 1)) { // Horizontal
+        $length --;
+        for($t=mt_rand(1,3),$i=0; $i<$t; $i++) {
+            if (mt_rand(0, 1)) {
+                // Horizontal
                 $Xa = mt_rand(0, $width / 2);
                 $Ya = mt_rand(0, $height);
                 $Xb = mt_rand($width / 2, $width);
                 $Yb = mt_rand(0, $height);
-            } else { // Vertical
+            } else {
+                // Vertical
                 $Xa = mt_rand(0, $width);
                 $Ya = mt_rand(0, $height / 2);
                 $Xb = mt_rand(0, $width);
                 $Yb = mt_rand($height / 2, $height);
             }
 
-            imagesetthickness($image, mt_rand(1, 3));
-            imageline($image, $Xa, $Ya, $Xb, $Yb, $color);
-
-            $length--;
+            imagesetthickness($image, mt_rand(2, 4));
+            imageline($image, $Xa, $Ya, $Xb, $Yb, $colors[mt_rand(0, $length)]);
         }
     }
 
@@ -193,7 +195,7 @@ class Bundle
      * @param $height
      * @param $length
      */
-    protected function writePhrase($image, $width, $height, $length)
+    protected function writePhrase($image, $width, $height, $length, $colors)
     {
         $plain = $this->option->isPlain();
 
@@ -207,20 +209,19 @@ class Bundle
 
         $size = $width / $length - mt_rand(0, 3) - $adjustment;
 
-        $box = \imagettfbbox($size, 0, $filename, $phrase);
+        $box = imagettfbbox($size, 0, $filename, $phrase);
 
         $textWidth = $box[2] - $box[0];
         $textHeight = $box[1] - $box[7];
         $x = ($width - $textWidth) / 2;
         $y = ($height - $textHeight) / 2 + $size;
 
-        $color = \imagecolorallocate($image, mt_rand(0, 150), mt_rand(0, 150), mt_rand(0, 150));
+        $color = $colors[0];
 
         for ($i = 0; $i < $length; $i++) {
-
             $text = mb_substr($phrase, $i, 1);
 
-            $box = \imagettfbbox($size, 0, $filename, $text);
+            $box = imagettfbbox($size, 0, $filename, $text);
 
             $w = $box[2] - $box[0];
 
@@ -228,13 +229,12 @@ class Bundle
 
             $offset = mt_rand(-$this->maxOffset, $this->maxOffset);
 
-            \imagettftext($image, $size, $angle, $x, $y + $offset, $color, $filename, $text);
+            imagettftext($image, $size, $angle, $x, $y + $offset, $color, $filename, $text);
 
             $x += $w;
-
             // 多彩模式
             if (false === $plain) {
-                $color = \imagecolorallocate($image, mt_rand(0, 150), mt_rand(0, 150), mt_rand(0, 150));
+                $color = next($colors);
             }
         }
     }
