@@ -164,10 +164,13 @@ class Bundle
      * @param $image
      * @param $width
      * @param $height
+     * @param $length
+     * @param $colors
      */
     protected function drawLines($image, $width, $height, $length, $colors)
     {
         $length --;
+        $color = $colors[0];
         for($t=mt_rand(1,3),$i=0; $i<$t; $i++) {
             if (mt_rand(0, 1)) {
                 // Horizontal
@@ -184,7 +187,10 @@ class Bundle
             }
 
             imagesetthickness($image, mt_rand(2, 4));
-            imageline($image, $Xa, $Ya, $Xb, $Yb, $colors[mt_rand(0, $length)]);
+            imageline($image, $Xa, $Ya, $Xb, $Yb, $color);
+            if(!$this->option->isPlain()) {
+                $color = $colors[mt_rand(0, $length)];
+            }
         }
     }
 
@@ -194,6 +200,7 @@ class Bundle
      * @param $width
      * @param $height
      * @param $length
+     * @param $colors
      */
     protected function writePhrase($image, $width, $height, $length, $colors)
     {
